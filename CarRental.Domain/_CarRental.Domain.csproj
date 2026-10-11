@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="RepositoryTests\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Interfaces\Common\" />
+    <Folder Include="ValueObjects\" />
   </ItemGroup>
 
 </Project>
