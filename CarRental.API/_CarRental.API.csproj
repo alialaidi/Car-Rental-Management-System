@@ -4,18 +4,25 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>CarRentalSystem-LocalDevelopment</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.31" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Authorization\Requirements\" />
     <Folder Include="Controllers\" />
-    <Folder Include="Middleware\" />
     <Folder Include="Filters\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Middleware\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarRental.Application\_CarRental.Application.csproj" />
+    <ProjectReference Include="..\CarRental.Infrastructure\_CarRental.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

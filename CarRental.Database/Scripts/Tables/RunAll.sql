@@ -2,7 +2,10 @@
 -- RunAll.sql
 -- Purpose: Executes every table script in the correct dependency order.
 -- Run this file with SQLCMD mode enabled (SSMS: Query > SQLCMD Mode).
+-- DEV RESET: run 99_DropAll.sql, then this file, then ../Seed/RunSeed.sql.
+-- This script recreates tables and is destructive; do not run against data you need.
 -- =====================================================================
+:on error exit
 :r .\00_CreateDatabase.sql
 :r .\01_Roles.sql
 :r .\02_Users.sql
@@ -19,6 +22,7 @@
 :r .\13_VehicleImages.sql
 :r .\14_Reservations.sql
 :r .\15_RentalContracts.sql
+:r .\20_ContractNumberSequence.sql
 :r .\16_Payments.sql
 :r .\17_MaintenanceRecords.sql
 :r .\18_Reviews.sql

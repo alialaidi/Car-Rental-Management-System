@@ -17,5 +17,8 @@ namespace _CarRental.Domain.Interfaces.Repositories
         Task AssignRoleAsync(int userId, int roleId);
         Task<IReadOnlyList<string>> GetRoleNamesAsync(int userId);
         Task<int?> GetRoleIdByNameAsync(string roleName);
+        Task<(IReadOnlyList<User> Items, int TotalCount)> ListAsync(int page, int pageSize, string? search, bool? isActive);
+        Task SetActiveAsync(int userId, bool isActive);
+        Task RemoveRoleAsync(int userId, int roleId);
     }
 }

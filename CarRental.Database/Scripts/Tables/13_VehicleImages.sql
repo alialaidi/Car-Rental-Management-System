@@ -2,6 +2,10 @@
 -- Table: VehicleImages
 -- Purpose: Gallery images per vehicle.
 -- =====================================================================
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
+
 IF OBJECT_ID('dbo.VehicleImages', 'U') IS NOT NULL DROP TABLE dbo.VehicleImages;
 GO
 
@@ -18,4 +22,6 @@ CREATE TABLE dbo.VehicleImages
 GO
 
 CREATE NONCLUSTERED INDEX IX_VehicleImages_VehicleId ON dbo.VehicleImages (VehicleId);
+CREATE UNIQUE NONCLUSTERED INDEX UQ_VehicleImages_OnePrimary
+    ON dbo.VehicleImages (VehicleId) WHERE IsPrimary = 1;
 GO

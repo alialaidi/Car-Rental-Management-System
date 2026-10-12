@@ -12,6 +12,7 @@ namespace _CarRental.Domain.Interfaces.Repositories
         Task<int> CreateAsync(RefreshToken refreshToken);
         Task<RefreshToken?> GetByTokenAsync(string token);
         Task RevokeAsync(int tokenId, DateTime revokedAtUtc);
+        Task<bool> TryRevokeAsync(int tokenId, DateTime revokedAtUtc);
         Task RevokeAllForUserAsync(int userId, DateTime revokedAtUtc);// تأجيل
     }
 }

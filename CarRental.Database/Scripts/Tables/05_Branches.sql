@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Table: Branches
 -- Purpose: Company branches/locations.
--- Note: ManagerEmployeeId FK is added later (06_Employees_AddManagerFK.sql)
+-- Note: ManagerEmployeeId FK is added later (08_Branches_AddManagerFK.sql)
 --       to break the circular dependency Branches <-> Employees.
 -- =====================================================================
 IF OBJECT_ID('dbo.Branches', 'U') IS NOT NULL DROP TABLE dbo.Branches;

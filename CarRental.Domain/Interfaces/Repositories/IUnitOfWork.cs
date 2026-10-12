@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace _CarRental.Domain.Interfaces.Repositories
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IAsyncDisposable
     {
         IUserRepository Users { get; }
         ICustomerRepository Customers { get; }
         IRefreshTokenRepository RefreshTokens { get; }
+        IBranchRepository Branches { get; }
+        IEmployeeRepository Employees { get; }
+        IVehicleRepository Vehicles { get; }
+        IVehicleImageRepository VehicleImages { get; }
+        ILookupRepository Lookups { get; }
+        IReservationRepository Reservations { get; }
+        IRentalContractRepository Contracts { get; }
+        IPaymentRepository Payments { get; }
 
         Task BeginTransactionAsync();
         Task CommitAsync();

@@ -1,0 +1,7 @@
+CREATE OR ALTER PROCEDURE dbo.usp_Branches_Count
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT COUNT(*) FROM dbo.Branches;
+END;
+GO
