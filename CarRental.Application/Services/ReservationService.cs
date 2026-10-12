@@ -250,4 +250,5 @@ public sealed class ReservationService(
         DateTime.SpecifyKind(reservation.CreatedAt, DateTimeKind.Utc));
 
     private sealed record StaffContext(int? BranchId, int? EmployeeId);
+
 }

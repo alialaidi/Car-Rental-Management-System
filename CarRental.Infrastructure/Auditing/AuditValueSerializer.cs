@@ -49,4 +49,6 @@ public static class AuditValueSerializer
     private static bool IsSensitive(string propertyName) =>
         propertyName.Contains("password", StringComparison.OrdinalIgnoreCase)
         || propertyName.Contains("token", StringComparison.OrdinalIgnoreCase);
+
+
 }

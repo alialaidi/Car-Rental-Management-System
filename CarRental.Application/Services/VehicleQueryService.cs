@@ -77,4 +77,6 @@ public sealed class VehicleQueryService(
             vehicle.SeatsCount, vehicle.DailyPrice, vehicle.BranchId, vehicle.Status,
             item.PrimaryImageUrl);
     }
+
+
 }

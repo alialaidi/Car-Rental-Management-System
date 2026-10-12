@@ -77,4 +77,6 @@ public sealed class CurrentUser(IHttpContextAccessor httpContextAccessor, IUnitO
         return employee?.BranchId
             ?? throw new NotFoundException("The current employee does not have a branch.");
     }
+
+
 }

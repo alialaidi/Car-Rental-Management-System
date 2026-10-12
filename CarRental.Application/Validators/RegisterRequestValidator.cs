@@ -53,4 +53,5 @@ public sealed class RegisterRequestValidator(IDateTimeProvider dateTimeProvider)
     }
 
     private static BusinessRuleException Invalid(string message) => new("VALIDATION_FAILED", message);
+
 }

@@ -11,6 +11,9 @@ public sealed class AuditLogger(
     IDateTimeProvider dateTimeProvider,
     ILogger<AuditLogger> logger) : IAuditLogger
 {
+
+
+
     public async Task LogAsync(
         string action,
         string entityName,
@@ -42,4 +45,6 @@ public sealed class AuditLogger(
             logger.LogError(exception, "Failed to write audit event {Action} for {EntityName}.", action, entityName);
         }
     }
+
+
 }

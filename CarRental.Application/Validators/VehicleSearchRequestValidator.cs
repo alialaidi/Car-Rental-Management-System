@@ -68,4 +68,6 @@ public sealed class VehicleSearchRequestValidator(IDateTimeProvider dateTimeProv
     }
 
     private static BusinessRuleException Invalid(string message) => new("VALIDATION_FAILED", message);
+
+
 }

@@ -139,4 +139,6 @@ public sealed class EmployeeService(
         return new EmployeeDto(employee.EmployeeId, user.UserId, user.Username, user.Email, user.PhoneNumber, user.IsActive,
             employee.BranchId, employee.Position, employee.HireDate, roles);
     }
+
+
 }

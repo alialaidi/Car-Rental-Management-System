@@ -40,4 +40,6 @@ public sealed class LookupService(IUnitOfWork unitOfWork,ICurrentUser currentUse
 
     private Task AuditAsync(VehicleLookupType type,int id,object value)=>auditLogger.LogAsync(AuditActions.LookupChanged,
         type.ToString(),id.ToString(CultureInfo.InvariantCulture),null,value,currentUser.UserId);
+
+
 }

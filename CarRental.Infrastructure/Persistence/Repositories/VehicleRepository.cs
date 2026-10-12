@@ -11,9 +11,13 @@ namespace _CarRental.Infrastructure.Persistence.Repositories;
 internal sealed class VehicleRepository(SqlExecutor executor) : IVehicleRepository
 {
     public Task<int> CreateAsync(Vehicle vehicle) => Run(() => executor.ExecuteScalarInt32Async("usp_Vehicles_Create", p => Configure(p, vehicle)));
+    
     public Task<Vehicle?> GetByIdAsync(int id) => executor.QuerySingleOrDefaultAsync("usp_Vehicles_GetById", VehicleMapper.Map, p => AddInt(p,"@VehicleId",id));
+   
     public Task<IReadOnlyList<Vehicle>> ListByBranchAsync(int branchId,int page,int pageSize) => executor.QueryAsync("usp_Vehicles_ListByBranch",VehicleMapper.Map,p=>{AddInt(p,"@BranchId",branchId);AddInt(p,"@Page",page);AddInt(p,"@PageSize",pageSize);});
+    
     public Task<int> GetCountByBranchAsync(int branchId) => executor.ExecuteScalarInt32Async("usp_Vehicles_CountByBranch",p=>AddInt(p,"@BranchId",branchId));
+    
     public async Task<VehicleCatalogPage> SearchAvailableAsync(VehicleSearchCriteria criteria)
     {
         var (counts, items) = await executor.QueryTwoResultSetsAsync(
@@ -23,7 +27,7 @@ internal sealed class VehicleRepository(SqlExecutor executor) : IVehicleReposito
             p => ConfigureSearch(p, criteria));
         return new VehicleCatalogPage(items, counts.FirstOrDefault());
     }
-
+    
     public async Task<VehicleCatalogDetails?> GetCatalogDetailsAsync(int vehicleId)
     {
         var rows = await executor.QueryAsync("usp_Vehicles_GetCatalogDetails", MapCatalogDetailsRow,
@@ -41,22 +45,28 @@ internal sealed class VehicleRepository(SqlExecutor executor) : IVehicleReposito
             AddDateTime(p, "@PickupDateTime", pickupDateTime);
             AddDateTime(p, "@ExpectedReturnDateTime", expectedReturnDateTime);
         });
+    
     public Task SetStatusAsync(int vehicleId, VehicleStatus status) => Run(() => executor.ExecuteNonQueryAsync(
         "usp_Vehicles_SetStatus", p =>
         {
             AddInt(p, "@VehicleId", vehicleId);
             AddText(p, "@Status", 20, status.ToString());
         }));
+    
     public Task LockForReservationReviewAsync(int vehicleId) => Run(() => executor.ExecuteNonQueryAsync(
         "usp_Vehicles_LockForReservationReview", p => AddInt(p, "@VehicleId", vehicleId)));
+   
     public Task<bool> HasOtherConfirmedReservationAsync(int vehicleId, int excludingReservationId) =>
         executor.ExecuteScalarBooleanAsync("usp_Vehicles_HasOtherConfirmedReservation", p =>
         {
             AddInt(p, "@VehicleId", vehicleId);
             AddInt(p, "@ExcludingReservationId", excludingReservationId);
         });
+    
     public Task UpdateAsync(Vehicle vehicle) => Run(() => executor.ExecuteNonQueryAsync("usp_Vehicles_Update",p=>{AddInt(p,"@VehicleId",vehicle.VehicleId);Configure(p,vehicle);}));
+    
     public Task DeleteAsync(int id) => Run(() => executor.ExecuteNonQueryAsync("usp_Vehicles_Delete",p=>AddInt(p,"@VehicleId",id)));
+   
     private static void Configure(SqlParameterCollection p,Vehicle v)
     {
         AddText(p,"@PlateNumber",20,v.PlateNumber);AddText(p,"@Make",100,v.Make);AddText(p,"@Model",100,v.Model);
@@ -122,10 +132,13 @@ internal sealed class VehicleRepository(SqlExecutor executor) : IVehicleReposito
 
     private static void AddNullableInt(SqlParameterCollection p, string name, int? value) =>
         p.Add(name, SqlDbType.Int).Value = value is null ? DBNull.Value : value.Value;
+    
     private static void AddNullableDateTime(SqlParameterCollection p, string name, DateTime? value) =>
         p.Add(name, SqlDbType.DateTime2).Value = value is null ? DBNull.Value : value.Value;
+    
     private static void AddDateTime(SqlParameterCollection p, string name, DateTime value) =>
         p.Add(name, SqlDbType.DateTime2).Value = value;
+    
     private static void AddNullableDecimal(SqlParameterCollection p, string name, decimal? value)
     {
         var parameter = p.Add(name, SqlDbType.Decimal);
@@ -135,7 +148,12 @@ internal sealed class VehicleRepository(SqlExecutor executor) : IVehicleReposito
     }
 
     private sealed record CatalogDetailsRow(VehicleCatalogItem CatalogItem, VehicleImage? Image);
+    
     private static async Task<T> Run<T>(Func<Task<T>> action){try{return await action();}catch(SqlException ex){SqlErrorTranslator.ThrowIfKnown(ex);throw;}}
+    
     private static void AddInt(SqlParameterCollection p,string n,int v)=>p.Add(n,SqlDbType.Int).Value=v;
+    
     private static void AddText(SqlParameterCollection p,string n,int size,string v)=>p.Add(n,SqlDbType.NVarChar,size).Value=v;
+
+
 }

@@ -59,4 +59,6 @@ public sealed class JwtService(JwtOptions options, IDateTimeProvider dateTimePro
 
     private static DateTime TruncateToSeconds(DateTime value) =>
         new(value.Ticks - value.Ticks % TimeSpan.TicksPerSecond, DateTimeKind.Utc);
+
+
 }

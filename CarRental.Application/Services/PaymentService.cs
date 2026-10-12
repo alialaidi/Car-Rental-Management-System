@@ -101,4 +101,6 @@ public sealed class PaymentService(IUnitOfWork unitOfWork, ICurrentUser currentU
     private static PaymentDto ToDto(Payment payment) => new(payment.PaymentId, payment.ContractId, payment.CustomerId,
         payment.Method.ToString(), payment.Amount, payment.TransactionReference, payment.Status.ToString(),
         DateTime.SpecifyKind(payment.PaymentDate, DateTimeKind.Utc));
+
+
 }

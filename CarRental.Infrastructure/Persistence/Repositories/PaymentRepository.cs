@@ -23,6 +23,7 @@ internal sealed class PaymentRepository(SqlExecutor executor) : IPaymentReposito
     });
 
     public Task<IReadOnlyList<Payment>> ListByContractAsync(int contractId) => Run(() => executor.QueryAsync("usp_Payments_ListByContract", PaymentMapper.Map, p => AddInt(p, "@ContractId", contractId)));
+    
     public Task<IReadOnlyList<Payment>> ListByCustomerAsync(int customerId) => Run(() => executor.QueryAsync("usp_Payments_ListByCustomer", PaymentMapper.Map, p => AddInt(p, "@CustomerId", customerId)));
 
     public async Task<PaymentBalance> GetBalanceAsync(int contractId) => await Run(() => executor.QuerySingleOrDefaultAsync("usp_Payments_GetBalance", r => new PaymentBalance(
@@ -34,8 +35,13 @@ internal sealed class PaymentRepository(SqlExecutor executor) : IPaymentReposito
         try { return await action(); }
         catch (SqlException exception) { SqlErrorTranslator.ThrowIfKnown(exception); throw; }
     }
+
     private static void AddInt(SqlParameterCollection p, string n, int v) => p.Add(n, SqlDbType.Int).Value = v;
+    
     private static void AddText(SqlParameterCollection p, string n, int s, string v) => p.Add(n, SqlDbType.NVarChar, s).Value = v;
+    
     private static void AddNullableText(SqlParameterCollection p, string n, int s, string? v) => p.Add(n, SqlDbType.NVarChar, s).Value = (object?)v ?? DBNull.Value;
+   
     private static void AddDecimal(SqlParameterCollection p, string n, decimal v) { var x = p.Add(n, SqlDbType.Decimal); x.Precision = 18; x.Scale = 2; x.Value = v; }
+
 }

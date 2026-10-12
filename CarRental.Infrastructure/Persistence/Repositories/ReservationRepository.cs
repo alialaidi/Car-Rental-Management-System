@@ -84,4 +84,6 @@ internal sealed class ReservationRepository(SqlExecutor executor) : IReservation
 
     private static void AddNullableInt(SqlParameterCollection parameters, string name, int? value) =>
         parameters.Add(name, SqlDbType.Int).Value = value is null ? DBNull.Value : value.Value;
+
+
 }

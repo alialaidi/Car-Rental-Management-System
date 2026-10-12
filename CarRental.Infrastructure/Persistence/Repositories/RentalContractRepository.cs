@@ -68,12 +68,19 @@ internal sealed class RentalContractRepository(SqlExecutor executor) : IRentalCo
     }
 
     private static void AddInt(SqlParameterCollection p, string name, int value) => p.Add(name, SqlDbType.Int).Value = value;
+    
     private static void AddNullableInt(SqlParameterCollection p, string name, int? value) => p.Add(name, SqlDbType.Int).Value = (object?)value ?? DBNull.Value;
+    
     private static void AddText(SqlParameterCollection p, string name, int size, string value) => p.Add(name, SqlDbType.NVarChar, size).Value = value;
+   
     private static void AddNullableText(SqlParameterCollection p, string name, int size, string? value) => p.Add(name, SqlDbType.NVarChar, size).Value = (object?)value ?? DBNull.Value;
+    
     private static void AddDateTime(SqlParameterCollection p, string name, DateTime value) => p.Add(name, SqlDbType.DateTime2).Value = value;
+    
     private static void AddDecimal(SqlParameterCollection p, string name, decimal value)
     {
         var parameter = p.Add(name, SqlDbType.Decimal); parameter.Precision = 18; parameter.Scale = 2; parameter.Value = value;
     }
+
+
 }

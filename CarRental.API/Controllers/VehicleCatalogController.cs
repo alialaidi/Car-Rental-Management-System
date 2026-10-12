@@ -11,15 +11,21 @@ namespace _CarRental.API.Controllers;
 [Authorize]
 public sealed class VehicleCatalogController(IVehicleQueryService vehicleQueryService) : ControllerBase
 {
+
+
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<VehicleListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public Task<PagedResult<VehicleListItemDto>> Search([FromQuery] VehicleSearchRequest request) =>
         vehicleQueryService.SearchAsync(request);
 
+
+
     [HttpGet("{vehicleId:int}")]
     [ProducesResponseType(typeof(VehicleDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public Task<VehicleDetailsDto> GetDetails(int vehicleId) =>
         vehicleQueryService.GetDetailsAsync(vehicleId);
+
+
 }

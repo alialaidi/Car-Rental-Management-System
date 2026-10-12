@@ -102,5 +102,8 @@ public sealed class BranchService(IUnitOfWork unitOfWork, ICurrentUser currentUs
         action, "Branches", branchId.ToString(CultureInfo.InvariantCulture), null, value, currentUser.UserId);
 
     private static Branch Map(CreateBranchRequest request) => new() { Name = request.Name, Address = request.Address, City = request.City, Phone = request.Phone };
+    
     private static BranchDto ToDto(Branch branch) => new(branch.BranchId, branch.Name, branch.Address, branch.City, branch.Phone, branch.ManagerEmployeeId);
+
+
 }

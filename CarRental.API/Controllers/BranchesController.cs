@@ -13,11 +13,15 @@ namespace _CarRental.API.Controllers;
 [Authorize(Roles = RoleNames.Admin + "," + RoleNames.BranchManager + "," + RoleNames.Employee)]
 public sealed class BranchesController(IBranchService branchService) : ControllerBase
 {
+
     [HttpGet]
     public Task<PagedResult<BranchDto>> List([FromQuery] PagedRequest request) => branchService.ListAsync(request);
 
+
+
     [HttpGet("{branchId:int}")]
     public Task<BranchDto> Get(int branchId) => branchService.GetAsync(branchId);
+
 
     [HttpPost]
     [Authorize(Roles = RoleNames.Admin)]
@@ -27,9 +31,13 @@ public sealed class BranchesController(IBranchService branchService) : Controlle
         return CreatedAtAction(nameof(Get), new { branchId = branch.BranchId }, branch);
     }
 
+
+
     [HttpPut("{branchId:int}")]
     [Authorize(Roles = RoleNames.Admin)]
     public Task<BranchDto> Update(int branchId, UpdateBranchRequest request) => branchService.UpdateAsync(branchId, request);
+
+
 
     [HttpDelete("{branchId:int}")]
     [Authorize(Roles = RoleNames.Admin)]
@@ -38,6 +46,8 @@ public sealed class BranchesController(IBranchService branchService) : Controlle
         await branchService.DeleteAsync(branchId);
         return NoContent();
     }
+
+
 
     [HttpPut("{branchId:int}/manager")]
     [Authorize(Roles = RoleNames.Admin)]

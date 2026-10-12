@@ -48,4 +48,6 @@ public sealed class AuthController(IAuthService authService) : ControllerBase
         await authService.LogoutAsync(request.RefreshToken);
         return NoContent();
     }
+
+
 }

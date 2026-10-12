@@ -102,4 +102,6 @@ internal sealed class AuditLogRepository(IDbConnectionFactory connectionFactory)
 
     private static void AddNVarChar(SqlParameterCollection parameters, string name, int size, string? value) =>
         parameters.Add(name, SqlDbType.NVarChar, size).Value = (object?)value ?? DBNull.Value;
+
+
 }

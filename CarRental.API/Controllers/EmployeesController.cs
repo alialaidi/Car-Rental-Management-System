@@ -19,13 +19,21 @@ public sealed class EmployeesController(IEmployeeService employeeService) : Cont
         return CreatedAtAction(nameof(Get), new { employeeId = employee.EmployeeId }, employee);
     }
 
+
+
     [HttpGet("{employeeId:int}")]
     public Task<EmployeeDto> Get(int employeeId) => employeeService.GetAsync(employeeId);
+
+
 
     [HttpGet]
     public Task<PagedResult<EmployeeDto>> List([FromQuery] int branchId, [FromQuery] PagedRequest request) =>
         employeeService.ListByBranchAsync(branchId, request);
 
+
+
     [HttpPut("{employeeId:int}")]
     public Task<EmployeeDto> Update(int employeeId, UpdateEmployeeRequest request) => employeeService.UpdateAsync(employeeId, request);
+
+
 }

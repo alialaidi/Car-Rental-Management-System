@@ -22,6 +22,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IRequestContext, HttpRequestContext>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
 var jwtOptions = new JwtOptions
 {
     Issuer = builder.Configuration[$"{JwtOptions.SectionName}:Issuer"] ?? string.Empty,
@@ -30,6 +31,7 @@ var jwtOptions = new JwtOptions
     AccessTokenMinutes = int.TryParse(builder.Configuration[$"{JwtOptions.SectionName}:AccessTokenMinutes"], out var accessTokenMinutes) ? accessTokenMinutes : 15,
     RefreshTokenDays = int.TryParse(builder.Configuration[$"{JwtOptions.SectionName}:RefreshTokenDays"], out var refreshTokenDays) ? refreshTokenDays : 7
 };
+
 jwtOptions.Validate();
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,9 +72,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
+
 builder.Services.AddAppAuthorization();
 var authPermitLimit = int.TryParse(builder.Configuration["RateLimiting:Auth:PermitLimit"], out var configuredPermitLimit) ? configuredPermitLimit : 5;
 var authWindowSeconds = int.TryParse(builder.Configuration["RateLimiting:Auth:WindowSeconds"], out var configuredWindowSeconds) ? configuredWindowSeconds : 60;
+
+
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -95,10 +101,13 @@ builder.Services.AddRateLimiter(options =>
             context.HttpContext.TraceIdentifier, cancellationToken);
     };
 });
+
+
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
     policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
         .AllowAnyHeader()
         .AllowAnyMethod()));
+
 
 var app = builder.Build();
 

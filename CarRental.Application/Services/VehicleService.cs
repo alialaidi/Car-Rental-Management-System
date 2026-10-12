@@ -110,8 +110,13 @@ public sealed class VehicleService(IUnitOfWork unitOfWork,ICurrentUser currentUs
     }
 
     private async Task<Vehicle> RequireVehicleAsync(int id)=>await unitOfWork.Vehicles.GetByIdAsync(id)??throw new NotFoundException("Vehicle was not found.");
+    
     private Task AuditAsync(string action,int id,object? oldValue,object? newValue)=>auditLogger.LogAsync(action,"Vehicles",id.ToString(CultureInfo.InvariantCulture),oldValue,newValue,currentUser.UserId);
+    
     private static Vehicle Map(CreateVehicleRequest r)=>new(){PlateNumber=r.PlateNumber,Make=r.Make,Model=r.Model,Year=r.Year,CategoryId=r.CategoryId,FuelTypeId=r.FuelTypeId,TransmissionTypeId=r.TransmissionTypeId,SeatsCount=r.SeatsCount,DailyPrice=r.DailyPrice,BranchId=r.BranchId,CurrentMileage=r.CurrentMileage,Status=VehicleStatus.Available.ToString()};
+    
     private static VehicleDto ToDto(Vehicle v)=>new(v.VehicleId,v.PlateNumber,v.Make,v.Model,v.Year,v.CategoryId,v.FuelTypeId,v.TransmissionTypeId,v.SeatsCount,v.DailyPrice,v.BranchId,v.Status,v.CurrentMileage);
+    
     private static VehicleImageDto ToDto(VehicleImage i)=>new(i.ImageId,i.VehicleId,i.ImageUrl,i.IsPrimary);
+
 }

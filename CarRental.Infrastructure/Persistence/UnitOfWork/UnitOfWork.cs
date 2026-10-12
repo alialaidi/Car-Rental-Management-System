@@ -19,6 +19,7 @@ internal sealed class UnitOfWork : IUnitOfWork
     private RentalContractRepository? _contracts;
     private PaymentRepository? _payments;
 
+
     public UnitOfWork(IDbConnectionFactory connectionFactory)
     {
         _session = new DbSession(connectionFactory);

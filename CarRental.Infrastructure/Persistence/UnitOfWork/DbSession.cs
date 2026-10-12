@@ -100,4 +100,6 @@ internal sealed class DbSession(IDbConnectionFactory connectionFactory) : IAsync
             _connectionGate.Release();
         }
     }
+
+
 }

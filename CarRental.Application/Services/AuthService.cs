@@ -250,4 +250,7 @@ public sealed class AuthService(
 
     internal static string HashRefreshToken(string token) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+
+
+
 }

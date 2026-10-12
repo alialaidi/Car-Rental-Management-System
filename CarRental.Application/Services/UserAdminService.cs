@@ -150,4 +150,6 @@ public sealed class UserAdminService(IUnitOfWork unitOfWork, ICurrentUser curren
         if (roles.Any(role => (role == RoleNames.Customer) != isCustomerRole))
             throw new ConflictException("MIXED_CUSTOMER_STAFF_ROLES_NOT_ALLOWED", "A user cannot hold both customer and staff roles.");
     }
+
+
 }

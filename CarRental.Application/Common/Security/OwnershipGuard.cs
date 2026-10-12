@@ -30,4 +30,6 @@ public sealed class OwnershipGuard(ICurrentUser currentUser)
         if (await currentUser.GetBranchIdAsync() != branchId)
             throw new ForbiddenException("You are not allowed to access this branch.");
     }
+
+
 }

@@ -45,4 +45,5 @@ public static class RentalPriceCalculator
             throw new ArgumentOutOfRangeException(nameof(discount), "Discount cannot exceed the final rental charges.");
         return total;
     }
+
 }

@@ -8,6 +8,7 @@ namespace _CarRental.Infrastructure.Persistence.Repositories;
 
 internal sealed class UserRepository(SqlExecutor executor) : IUserRepository
 {
+
     public Task<User?> GetByIdAsync(int userId) => executor.QuerySingleOrDefaultAsync(
         "usp_Users_GetById",
         UserMapper.Map,
@@ -126,4 +127,6 @@ internal sealed class UserRepository(SqlExecutor executor) : IUserRepository
 
     private static void AddNVarChar(SqlParameterCollection parameters, string name, int size, string value) =>
         parameters.Add(name, SqlDbType.NVarChar, size).Value = value;
+
+
 }

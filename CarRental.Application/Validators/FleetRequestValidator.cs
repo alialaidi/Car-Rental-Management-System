@@ -47,4 +47,6 @@ public static class FleetRequestValidator
         if(normalized.Length==0||normalized.Length>length) throw new BusinessRuleException($"{name} is required and cannot exceed {length} characters.");
         return normalized;
     }
+
+
 }

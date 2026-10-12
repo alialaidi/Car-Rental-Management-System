@@ -52,4 +52,6 @@ public sealed class GlobalExceptionMiddleware(RequestDelegate next, ILogger<Glob
             await context.Response.WriteAsJsonAsync(problem, options: null, contentType: "application/problem+json", cancellationToken: context.RequestAborted);
         }
     }
+
+
 }

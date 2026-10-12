@@ -11,6 +11,8 @@ namespace _CarRental.API.Controllers;
 [Authorize(Roles = "Customer")]
 public sealed class ReservationsController(IReservationService reservationService) : ControllerBase
 {
+
+
     [HttpPost]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -21,19 +23,27 @@ public sealed class ReservationsController(IReservationService reservationServic
         return CreatedAtAction(nameof(GetMine), new { reservationId = reservation.ReservationId }, reservation);
     }
 
+
+
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<ReservationDto>), StatusCodes.Status200OK)]
     public Task<PagedResult<ReservationDto>> ListMine([FromQuery] PagedRequest request) =>
         reservationService.ListMineAsync(request);
+
+
 
     [HttpGet("{reservationId:int}")]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public Task<ReservationDto> GetMine(int reservationId) => reservationService.GetMineAsync(reservationId);
 
+
+
     [HttpPost("{reservationId:int}/cancel")]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public Task<ReservationDto> CancelMine(int reservationId) => reservationService.CancelMineAsync(reservationId);
+
+
 }

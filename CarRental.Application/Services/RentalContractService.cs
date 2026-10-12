@@ -170,4 +170,5 @@ public sealed class RentalContractService(
         contract.ReturnMileage, contract.ReturnFuelLevel?.ToString());
 
     private sealed record StaffContext(int? BranchId, int? EmployeeId);
+
 }

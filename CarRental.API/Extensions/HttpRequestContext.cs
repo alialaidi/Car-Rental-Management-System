@@ -19,4 +19,6 @@ public sealed class HttpRequestContext(IHttpContextAccessor httpContextAccessor)
 
         return value.Length <= maximumLength ? value : value[..maximumLength];
     }
+
+
 }
