@@ -18,6 +18,9 @@ internal sealed class UnitOfWork : IUnitOfWork
     private ReservationRepository? _reservations;
     private RentalContractRepository? _contracts;
     private PaymentRepository? _payments;
+    private MaintenanceRepository? _maintenance;
+    private ReviewRepository? _reviews;
+    private ReportRepository? _reports;
 
 
     public UnitOfWork(IDbConnectionFactory connectionFactory)
@@ -37,6 +40,9 @@ internal sealed class UnitOfWork : IUnitOfWork
     public IReservationRepository Reservations => _reservations ??= new ReservationRepository(_executor);
     public IRentalContractRepository Contracts => _contracts ??= new RentalContractRepository(_executor);
     public IPaymentRepository Payments => _payments ??= new PaymentRepository(_executor);
+    public IMaintenanceRepository Maintenance => _maintenance ??= new MaintenanceRepository(_executor);
+    public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_executor);
+    public IReportRepository Reports => _reports ??= new ReportRepository(_executor);
 
     public Task BeginTransactionAsync() => _session.BeginTransactionAsync();
     public Task CommitAsync() => _session.CommitAsync();

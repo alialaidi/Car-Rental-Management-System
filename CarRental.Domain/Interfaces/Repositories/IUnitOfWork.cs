@@ -19,6 +19,9 @@ namespace _CarRental.Domain.Interfaces.Repositories
         IReservationRepository Reservations { get; }
         IRentalContractRepository Contracts { get; }
         IPaymentRepository Payments { get; }
+        IMaintenanceRepository Maintenance { get; }
+        IReviewRepository Reviews { get; }
+        IReportRepository Reports { get; }
 
         Task BeginTransactionAsync();
         Task CommitAsync();

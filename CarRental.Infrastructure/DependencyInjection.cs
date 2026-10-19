@@ -6,8 +6,10 @@ using _CarRental.Infrastructure.Auditing;
 using _CarRental.Infrastructure.Persistence.Repositories;
 using _CarRental.Infrastructure.Persistence.UnitOfWork;
 using _CarRental.Infrastructure.Identity;
+using _CarRental.Infrastructure.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace _CarRental.Infrastructure;
 
@@ -36,6 +38,16 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IAuditLogger, AuditLogger>();
+        var monitoring = configuration.GetSection("Monitoring:Alerts");
+        var serverErrorThreshold = int.TryParse(monitoring["ServerErrors:Threshold"], out var errors) ? errors : 5;
+        var serverErrorWindowSeconds = int.TryParse(monitoring["ServerErrors:WindowSeconds"], out var errorWindow) ? errorWindow : 60;
+        var failedLoginThreshold = int.TryParse(monitoring["FailedLogins:ThresholdPerSource"], out var logins) ? logins : 5;
+        var failedLoginWindowSeconds = int.TryParse(monitoring["FailedLogins:WindowSeconds"], out var loginWindow) ? loginWindow : 300;
+        services.AddSingleton<IAlertNotifier>(provider => new LogAlertNotifier(
+            provider.GetRequiredService<ILogger<LogAlertNotifier>>(), serverErrorThreshold,
+            TimeSpan.FromSeconds(Math.Clamp(serverErrorWindowSeconds, 1, 3600)), failedLoginThreshold,
+            TimeSpan.FromSeconds(Math.Clamp(failedLoginWindowSeconds, 1, 3600))));
+        services.AddScoped<IDatabaseHealthProbe, SqlHealthCheck>();
         return services;
     }
 }

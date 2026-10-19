@@ -71,6 +71,40 @@ internal sealed class AuditLogRepository(IDbConnectionFactory connectionFactory)
         }
     }
 
+    public async Task<(IReadOnlyList<AuditLog> Items, int TotalCount)> SearchAsync(int page, int pageSize,
+        int? actorUserId, string? action, string? entityName, DateTime? fromUtc, DateTime? toUtcExclusive)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var offset = (long)(page - 1) * pageSize;
+        await using var connection = connectionFactory.CreateConnection();
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "usp_AuditLogs_Search";
+        command.CommandType = CommandType.StoredProcedure;
+        command.Parameters.Add("@Offset", SqlDbType.BigInt).Value = offset;
+        command.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+        AddNullableInt32(command.Parameters, "@ActorUserId", actorUserId);
+        AddNVarChar(command.Parameters, "@Action", 100, action);
+        AddNVarChar(command.Parameters, "@EntityName", 100, entityName);
+        command.Parameters.Add("@FromUtc", SqlDbType.DateTime2).Value = (object?)fromUtc ?? DBNull.Value;
+        command.Parameters.Add("@ToUtcExclusive", SqlDbType.DateTime2).Value = (object?)toUtcExclusive ?? DBNull.Value;
+        try
+        {
+            await using var reader = await command.ExecuteReaderAsync();
+            var total = await reader.ReadAsync() ? reader.GetInt32(reader.GetOrdinal("TotalCount")) : 0;
+            var results = new List<AuditLog>();
+            if (await reader.NextResultAsync())
+                while (await reader.ReadAsync()) results.Add(Map(reader));
+            return (results, total);
+        }
+        catch (SqlException exception)
+        {
+            SqlErrorTranslator.ThrowIfKnown(exception);
+            throw;
+        }
+    }
+
     private static AuditLog Map(SqlDataReader reader) => new()
     {
         AuditId = reader.GetInt32(reader.GetOrdinal("AuditId")),

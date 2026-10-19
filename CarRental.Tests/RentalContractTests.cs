@@ -344,6 +344,9 @@ public sealed class RentalContractTests
         public IVehicleRepository Vehicles => vehicles;
         public IRentalContractRepository Contracts => contracts;
         public IPaymentRepository Payments => throw new NotSupportedException();
+        public IMaintenanceRepository Maintenance => throw new NotSupportedException();
+        public IReviewRepository Reviews => throw new NotSupportedException();
+        public IReportRepository Reports => throw new NotSupportedException();
         public IUserRepository Users => throw new NotSupportedException();
         public ICustomerRepository Customers => throw new NotSupportedException();
         public IRefreshTokenRepository RefreshTokens => throw new NotSupportedException();

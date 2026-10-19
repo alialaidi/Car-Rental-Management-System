@@ -65,6 +65,20 @@ internal static class SqlErrorTranslator
                 throw new ConflictException("VEHICLE_STATE_CONFLICT", "The vehicle is not in a returnable state.");
             case 50070:
                 throw new BusinessRuleException("INVALID_RENTAL_DAYS", "Final rental days do not match the return date.");
+            case 50080:
+                throw new NotFoundException("The requested vehicle or maintenance record does not exist.");
+            case 50081:
+                throw new ConflictException("VEHICLE_STATE_CONFLICT", "The vehicle's current state does not allow this maintenance operation.");
+            case 50082:
+                throw new ConflictException("MAINTENANCE_RESERVATION_OVERLAP", "A confirmed reservation overlaps the maintenance period.");
+            case 50083:
+                throw new ConflictException("MAINTENANCE_ALREADY_IN_PROGRESS", "The vehicle already has maintenance in progress.");
+            case 50085:
+                throw new ConflictException("MAINTENANCE_NOT_IN_PROGRESS", "Only maintenance in progress can be changed.");
+            case 50091:
+                throw new ConflictException("CONTRACT_NOT_COMPLETED", "Only completed contracts can be reviewed.");
+            case 50093:
+                throw new NotFoundException("The requested review or contract does not exist.");
             case 50055:
                 throw new BusinessRuleException("INVALID_LOOKUP_TYPE", "The lookup type is invalid.");
             default:

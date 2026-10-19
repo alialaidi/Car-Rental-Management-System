@@ -3,6 +3,7 @@ using _CarRental.Application.Constants.PolicyNames;
 using _CarRental.Application.DTOs.Payments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace _CarRental.API.Controllers;
 
@@ -13,6 +14,7 @@ public sealed class PaymentsController(IPaymentService paymentService) : Control
 
     [HttpPost("api/contracts/{contractId:int}/payments")]
     [Authorize(Policy = Policies.ProcessPayments)]
+    [EnableRateLimiting("payment")]
     [ProducesResponseType(typeof(PaymentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<PaymentDto>> Create(int contractId, CreatePaymentRequest request)
@@ -43,12 +45,14 @@ public sealed class PaymentsController(IPaymentService paymentService) : Control
 
     [HttpPost("api/payments/{paymentId:int}/status")]
     [Authorize(Policy = Policies.ProcessPayments)]
+    [EnableRateLimiting("payment")]
     public Task<PaymentDto> UpdateStatus(int paymentId, UpdatePaymentStatusRequest request) => paymentService.UpdateStatusAsync(paymentId, request);
 
 
 
     [HttpPost("api/payments/{paymentId:int}/refund")]
     [Authorize(Policy = Policies.ProcessPayments)]
+    [EnableRateLimiting("payment")]
     public Task<PaymentDto> Refund(int paymentId) => paymentService.RefundAsync(paymentId);
 
 

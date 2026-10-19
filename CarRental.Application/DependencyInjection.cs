@@ -28,6 +28,12 @@ public static class DependencyInjection
         services.AddScoped<ReturnVehicleRequestValidator>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<CreatePaymentRequestValidator>();
+        services.AddScoped<IMaintenanceService, MaintenanceService>();
+        services.AddScoped<MaintenanceRequestValidator>();
+        services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<ReviewRequestValidator>();
+        services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IAuditQueryService, AuditQueryService>();
         return services;
     }
 }

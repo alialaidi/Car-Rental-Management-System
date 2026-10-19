@@ -27,4 +27,11 @@ public static class AuditActions
     public const string RentalContractCreated = "RentalContracts.Created";
     public const string RentalContractReturned = "RentalContracts.Returned";
     public const string PaymentCompleted = "Payments.Completed";
+    public const string MaintenanceCreated = "Maintenance.Created";
+    public const string MaintenanceUpdated = "Maintenance.Updated";
+    public const string MaintenanceCompleted = "Maintenance.Completed";
+    public const string MaintenanceCancelled = "Maintenance.Cancelled";
+    public const string ReviewCreated = "Reviews.Created";
+    public const string ReviewUpdated = "Reviews.Updated";
+    public const string ReviewDeleted = "Reviews.Deleted";
 }

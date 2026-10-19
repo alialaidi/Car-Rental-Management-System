@@ -60,6 +60,10 @@ public sealed class AuditUnitTests
 
         public Task<IReadOnlyList<AuditLog>> QueryAsync(int page, int pageSize, int? actorUserId = null, string? entityName = null) =>
             throw new NotSupportedException();
+
+        public Task<(IReadOnlyList<AuditLog> Items, int TotalCount)> SearchAsync(int page, int pageSize,
+            int? actorUserId, string? action, string? entityName, DateTime? fromUtc, DateTime? toUtcExclusive) =>
+            throw new NotSupportedException();
     }
 
     private sealed class StubRequestContext : IRequestContext

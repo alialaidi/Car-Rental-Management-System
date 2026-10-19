@@ -11,4 +11,7 @@ public interface IAuditLogRepository
         int pageSize,
         int? actorUserId = null,
         string? entityName = null);
+
+    Task<(IReadOnlyList<AuditLog> Items, int TotalCount)> SearchAsync(int page, int pageSize,
+        int? actorUserId, string? action, string? entityName, DateTime? fromUtc, DateTime? toUtcExclusive);
 }

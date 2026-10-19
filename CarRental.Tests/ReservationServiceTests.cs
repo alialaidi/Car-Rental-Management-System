@@ -313,6 +313,9 @@ public sealed class ReservationServiceTests
         public ILookupRepository Lookups => throw new NotSupportedException();
         public IRentalContractRepository Contracts => throw new NotSupportedException();
         public IPaymentRepository Payments => throw new NotSupportedException();
+        public IMaintenanceRepository Maintenance => throw new NotSupportedException();
+        public IReviewRepository Reviews => throw new NotSupportedException();
+        public IReportRepository Reports => throw new NotSupportedException();
         public Task BeginTransactionAsync() => Task.CompletedTask;
         public Task CommitAsync() => Task.CompletedTask;
         public Task RollbackAsync() => Task.CompletedTask;

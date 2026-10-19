@@ -17,6 +17,8 @@ public sealed class AuthService(
     IJwtService jwtService,
     IDateTimeProvider dateTimeProvider,
     IAuditLogger auditLogger,
+    IAlertNotifier alertNotifier,
+    IRequestContext requestContext,
     RegisterRequestValidator registerValidator,
     LoginRequestValidator loginValidator) : IAuthService
 {
@@ -96,6 +98,7 @@ public sealed class AuthService(
                 oldValue: null,
                 newValue: new { Result = "failed" },
                 actorUserId: user?.UserId);
+            alertNotifier.RecordFailedLogin(requestContext.IpAddress);
             throw new UnauthorizedException(GenericLoginFailure);
         }
 

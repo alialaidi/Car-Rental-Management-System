@@ -104,6 +104,33 @@ public sealed class RentalContractIntegrationTests
             Assert.Equal(110, returnedVehicle?.CurrentMileage);
             Assert.Equal(ReservationStatus.Completed, completedReservation?.Status);
 
+            var review = Review.Create(contractId, 5, "  Great rental experience  ");
+            await verifyUnitOfWork.BeginTransactionAsync();
+            review.ReviewId = await verifyUnitOfWork.Reviews.CreateAsync(review, fixture.CustomerId);
+            await verifyUnitOfWork.CommitAsync();
+            var vehicleReviews = await verifyUnitOfWork.Reviews.ListByVehicleAsync(fixture.VehicleId, 1, 10);
+            Assert.Equal(1, vehicleReviews.TotalCount);
+            Assert.Equal(5m, vehicleReviews.AverageRating);
+            Assert.Equal("Great rental experience", vehicleReviews.Items.Single().Comment);
+
+            await verifyUnitOfWork.BeginTransactionAsync();
+            var duplicateReview = await Assert.ThrowsAsync<ConflictException>(() =>
+                verifyUnitOfWork.Reviews.CreateAsync(Review.Create(contractId, 4, null), fixture.CustomerId));
+            Assert.Equal("DUPLICATE_VALUE", duplicateReview.Code);
+            await verifyUnitOfWork.RollbackAsync();
+
+            var editableReview = await verifyUnitOfWork.Reviews.GetByIdAsync(review.ReviewId);
+            Assert.NotNull(editableReview);
+            editableReview!.Update(4, "Updated feedback");
+            await verifyUnitOfWork.BeginTransactionAsync();
+            await verifyUnitOfWork.Reviews.UpdateAsync(editableReview, fixture.CustomerId);
+            await verifyUnitOfWork.CommitAsync();
+            Assert.Equal("Updated feedback", (await verifyUnitOfWork.Reviews.GetByIdAsync(review.ReviewId))?.Comment);
+            await verifyUnitOfWork.BeginTransactionAsync();
+            await verifyUnitOfWork.Reviews.DeleteAsync(review.ReviewId, fixture.CustomerId);
+            await verifyUnitOfWork.CommitAsync();
+            Assert.Null(await verifyUnitOfWork.Reviews.GetByIdAsync(review.ReviewId));
+
             async Task<bool> TryCreateConcurrentPaymentAsync()
             {
                 await using var scope = provider.CreateAsyncScope();
@@ -144,6 +171,41 @@ public sealed class RentalContractIntegrationTests
             var refundedBalance = await verifyUnitOfWork.Payments.GetBalanceAsync(contractId);
             Assert.Equal(70m, refundedBalance.RefundedAmount);
             Assert.Equal(128m, refundedBalance.Balance);
+
+            var startDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            var maintenance = MaintenanceRecord.Open(fixture.VehicleId, fixture.BranchId, fixture.EmployeeId,
+                "Post-rental inspection", "Integration lifecycle", startDate, startDate.AddDays(2));
+            await verifyUnitOfWork.BeginTransactionAsync();
+            maintenance.MaintenanceId = await verifyUnitOfWork.Maintenance.CreateAsync(maintenance);
+            await verifyUnitOfWork.CommitAsync();
+            Assert.Equal(VehicleStatus.Maintenance.ToString(), (await verifyUnitOfWork.Vehicles.GetByIdAsync(fixture.VehicleId))?.Status);
+
+            await verifyUnitOfWork.BeginTransactionAsync();
+            var duplicateMaintenance = MaintenanceRecord.Open(fixture.VehicleId, fixture.BranchId, fixture.EmployeeId,
+                "Duplicate", null, startDate, null);
+            var maintenanceConflict = await Assert.ThrowsAsync<ConflictException>(() => verifyUnitOfWork.Maintenance.CreateAsync(duplicateMaintenance));
+            Assert.Equal("MAINTENANCE_ALREADY_IN_PROGRESS", maintenanceConflict.Code);
+            await verifyUnitOfWork.RollbackAsync();
+
+            await verifyUnitOfWork.BeginTransactionAsync();
+            await verifyUnitOfWork.Maintenance.UpdateAsync(MaintenanceRecord.FromPersistence(maintenance.MaintenanceId,
+                fixture.VehicleId, fixture.BranchId, fixture.EmployeeId, "Inspection", "Updated details", startDate,
+                startDate.AddDays(3), null, null, MaintenanceStatus.InProgress));
+            await verifyUnitOfWork.Maintenance.CompleteAsync(maintenance.MaintenanceId, startDate, 35m);
+            await verifyUnitOfWork.CommitAsync();
+            var completedMaintenance = await verifyUnitOfWork.Maintenance.GetByIdAsync(maintenance.MaintenanceId);
+            Assert.Equal(MaintenanceStatus.Completed, completedMaintenance?.Status);
+            Assert.Equal(35m, completedMaintenance?.Cost);
+            Assert.Equal(VehicleStatus.Available.ToString(), (await verifyUnitOfWork.Vehicles.GetByIdAsync(fixture.VehicleId))?.Status);
+
+            var cancelledMaintenance = MaintenanceRecord.Open(fixture.VehicleId, fixture.BranchId, fixture.EmployeeId,
+                "Cancelled test", null, startDate, null);
+            await verifyUnitOfWork.BeginTransactionAsync();
+            cancelledMaintenance.MaintenanceId = await verifyUnitOfWork.Maintenance.CreateAsync(cancelledMaintenance);
+            await verifyUnitOfWork.Maintenance.CancelAsync(cancelledMaintenance.MaintenanceId);
+            await verifyUnitOfWork.CommitAsync();
+            Assert.Equal(MaintenanceStatus.Cancelled, (await verifyUnitOfWork.Maintenance.GetByIdAsync(cancelledMaintenance.MaintenanceId))?.Status);
+            Assert.Equal(VehicleStatus.Available.ToString(), (await verifyUnitOfWork.Vehicles.GetByIdAsync(fixture.VehicleId))?.Status);
         }
         finally
         {
@@ -180,6 +242,8 @@ public sealed class RentalContractIntegrationTests
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
         command.CommandText = """
+            DELETE r FROM dbo.Reviews r INNER JOIN dbo.RentalContracts c ON c.ContractId = r.ContractId WHERE c.ReservationId = @ReservationId;
+            DELETE FROM dbo.MaintenanceRecords WHERE VehicleId = @VehicleId;
             DELETE p FROM dbo.Payments p INNER JOIN dbo.RentalContracts c ON c.ContractId = p.ContractId WHERE c.ReservationId = @ReservationId;
             DELETE FROM dbo.RentalContracts WHERE ReservationId = @ReservationId;
             DELETE FROM dbo.Reservations WHERE ReservationId = @ReservationId;

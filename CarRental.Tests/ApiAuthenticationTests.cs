@@ -17,12 +17,58 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace _CarRental.Tests;
 
 public sealed class ApiAuthenticationTests
 {
+    [Fact]
+    public async Task LivenessEndpointIsAnonymousAndDoesNotRequireDatabase()
+    {
+        using var factory = new AuthenticatedApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/health/live");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Healthy", await response.Content.ReadAsStringAsync());
+        Assert.True(response.Headers.Contains("X-Correlation-ID"));
+        Assert.Equal("nosniff", response.Headers.GetValues("X-Content-Type-Options").Single());
+        Assert.Equal("DENY", response.Headers.GetValues("X-Frame-Options").Single());
+    }
+
+    [Fact]
+    public async Task SwaggerDocumentPublishesBearerJwtSecurityScheme()
+    {
+        using var factory = new AuthenticatedApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/swagger/v1/swagger.json");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var scheme = document.RootElement.GetProperty("components").GetProperty("securitySchemes").GetProperty("Bearer");
+        Assert.Equal("http", scheme.GetProperty("type").GetString());
+        Assert.Equal("bearer", scheme.GetProperty("scheme").GetString());
+        var paths = document.RootElement.GetProperty("paths");
+        Assert.False(paths.GetProperty("/api/auth/login").GetProperty("post").TryGetProperty("security", out _));
+        Assert.True(paths.GetProperty("/api/catalog/vehicles").GetProperty("get").TryGetProperty("security", out _));
+    }
+
+    [Fact]
+    public async Task ReadinessEndpointReturnsServiceUnavailableWhenDatabaseProbeFails()
+    {
+        using var factory = new AuthenticatedApiFactory(simulateDbUnavailable: true);
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/health/ready");
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal("Unavailable", await response.Content.ReadAsStringAsync());
+    }
+
     [Fact]
     public async Task VehicleCatalogRequiresAuthentication()
     {
@@ -503,10 +549,11 @@ public sealed class ApiAuthenticationTests
         CategoryId=1,FuelTypeId=1,TransmissionTypeId=1,SeatsCount=5,DailyPrice=35.50m,BranchId=branchId,CurrentMileage=10
     };
 
-    private sealed class AuthenticatedApiFactory(int authPermitLimit = 5) : WebApplicationFactory<Program>
+    internal sealed class AuthenticatedApiFactory(int authPermitLimit = 5, bool simulateDbUnavailable = false) : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.ConfigureLogging(logging => logging.ClearProviders());
             builder.UseContentRoot(FindApiContentRoot());
             var testConnectionString = Environment.GetEnvironmentVariable("CAR_RENTAL_TEST_CONNECTION_STRING");
             if (string.IsNullOrWhiteSpace(testConnectionString))
@@ -526,7 +573,11 @@ public sealed class ApiAuthenticationTests
             }));
 
             builder.ConfigureTestServices(services =>
-                services.AddControllers().AddApplicationPart(typeof(TestProtectedController).Assembly));
+            {
+                services.AddControllers().AddApplicationPart(typeof(TestProtectedController).Assembly);
+                if (simulateDbUnavailable)
+                    services.AddScoped<IDatabaseHealthProbe, UnavailableDatabaseHealthProbe>();
+            });
         }
 
         private static string FindApiContentRoot()
@@ -538,6 +589,11 @@ public sealed class ApiAuthenticationTests
             return directory is null
                 ? throw new DirectoryNotFoundException("Could not find the repository CarRental.API content root.")
                 : Path.Combine(directory.FullName, "CarRental.API");
+        }
+
+        private sealed class UnavailableDatabaseHealthProbe : IDatabaseHealthProbe
+        {
+            public Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default) => Task.FromResult(false);
         }
     }
 }
