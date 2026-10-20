@@ -4,6 +4,7 @@
 :r .\01_Roles.sql
 :r .\02_Lookups.sql
 :r .\03_BootstrapBranchAndAdmin.sql
+:r .\04_EducationalDemoData.sql
 
-PRINT 'CarRentalDB baseline seed completed.';
+PRINT 'CarRentalDB baseline and educational demo seed completed.';
 GO
